@@ -46,7 +46,14 @@ Given 2 strings s1 and s2, returns a string that is the result of
 concatenating s1 and s2. 
 */
 UStr concat(UStr s1, UStr s2) {
-	// TODO: implement this
+    	int total_len = s1.length + s2.length;
+       	char* new_contents = malloc(total_len + 1);
+        strcpy(new_contents, str1.contents);
+        strcat(new_contents, str2.contents);
+	free(str1.contents);
+        free(str2.contents);
+	Ustr result = { total_len, new_contents };
+        return result;// TODO: implement this
 
 }
 
