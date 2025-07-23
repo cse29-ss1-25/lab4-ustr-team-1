@@ -38,7 +38,46 @@ Returns an empty string on invalid range.
 */
 UStr substring(UStr s, int32_t start, int32_t end) {
 	// TODO: implement this
-
+	//case: all ascii
+	if(s.is_ascii == 1)
+	{
+		s.contents[end] = '\0';
+		s = s.contents + start;
+		return s;
+	}
+	//case: invalid range
+	if(start < 0 || end > s.codepoints)
+	{
+		free(s.contents);
+		s.contents = malloc(1);
+		s.contents[0] = '\0';
+		return s;
+	}
+	int start_byte = 0;
+	for(int i = 0; i < s.codepoints; i++)
+	{
+		//single byte
+		if(s.contents[i] > 0 && s.contents[i] < 127)
+		{
+			start_byte++;
+			continue;
+		}
+		if((s.contents[i] & 0xE0) == 0xC0)
+		{
+			start_byte +=2;
+			continue;
+		}
+		if((s.contents[i] & 0xF0) == 0xE0)
+		{
+			start_byte += 3;
+			continue;
+		}
+		if((s.contents[i] & 0xF8) == 0xF0)
+		{
+			start_byte +=4;
+			continue;
+		}
+	}
 }
 
 /*
