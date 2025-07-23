@@ -38,20 +38,12 @@ Returns an empty string on invalid range.
 */
 UStr substring(UStr s, int32_t start, int32_t end) {
 	// TODO: implement this
-	//case: all ascii
-	if(s.is_ascii == 1)
-	{
-		s.contents[end] = '\0';
-		s = s.contents + start;
-		return s;
-	}
+	UStr newStr;
 	//case: invalid range
 	if(start < 0 || end > s.codepoints)
 	{
-		free(s.contents);
-		s.contents = malloc(1);
-		s.contents[0] = '\0';
-		return s;
+		UStr new = new_ustr("");
+		return new;
 	}
 	int start_byte = 0;
 	for(int i = 0; i < s.codepoints; i++)
@@ -62,6 +54,7 @@ UStr substring(UStr s, int32_t start, int32_t end) {
 			start_byte++;
 			continue;
 		}
+
 		if((s.contents[i] & 0xE0) == 0xC0)
 		{
 			start_byte +=2;
@@ -78,6 +71,44 @@ UStr substring(UStr s, int32_t start, int32_t end) {
 			continue;
 		}
 	}
+	s.contents = s.contents + start_byte;
+	int diff = start - end;
+	int iter = 0;
+	int count = start_byte;
+	for(int i = start_byte; i < s.bytes && iter < diff; i ++)
+	{
+		//single byte
+		if(s.contents[i] > 0 && s.contents[i] < 127)
+		{
+			iter++;
+			count++;
+			continue;
+		}
+		if((s.contents[i] & 0xE0) == 0xC0)
+		{
+			iter++;
+			count+=2;
+			i++;
+			continue;
+		}
+		if((s.contents[i] & 0xF0) == 0xE0)
+		{
+			iter++;
+			count+=3;
+			i+=2;
+			continue;
+		}
+		if((s.contents[i] & 0xF8) == 0xF0)
+		{
+			iter++;
+			count+=4;
+			i+=3;
+		}
+	}
+	s.contents[count] = '\0';
+	s.contents = s.contents + start_byte;
+	return s;
+	
 }
 
 /*
