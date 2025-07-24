@@ -40,74 +40,17 @@ UStr substring(UStr s, int32_t start, int32_t end) {
 	// TODO: implement this
 	UStr newStr;
 	//case: invalid range
-	if(start < 0 || end > s.codepoints)
+	if(start < 0 || end > s.codepoints || start > end)
 	{
 		UStr new = new_ustr("");
 		return new;
 	}
-	int start_byte = 0;
-	for(int i = 0; i < s.codepoints; i++)
-	{
-		//single byte
-		if(s.contents[i] > 0 && s.contents[i] < 127)
-		{
-			start_byte++;
-			continue;
-		}
-
-		if((s.contents[i] & 0xE0) == 0xC0)
-		{
-			start_byte +=2;
-			continue;
-		}
-		if((s.contents[i] & 0xF0) == 0xE0)
-		{
-			start_byte += 3;
-			continue;
-		}
-		if((s.contents[i] & 0xF8) == 0xF0)
-		{
-			start_byte +=4;
-			continue;
-		}
-	}
-	s.contents = s.contents + start_byte;
-	int diff = start - end;
-	int iter = 0;
-	int count = start_byte;
-	for(int i = start_byte; i < s.bytes && iter < diff; i ++)
-	{
-		//single byte
-		if(s.contents[i] > 0 && s.contents[i] < 127)
-		{
-			iter++;
-			count++;
-			continue;
-		}
-		if((s.contents[i] & 0xE0) == 0xC0)
-		{
-			iter++;
-			count+=2;
-			i++;
-			continue;
-		}
-		if((s.contents[i] & 0xF0) == 0xE0)
-		{
-			iter++;
-			count+=3;
-			i+=2;
-			continue;
-		}
-		if((s.contents[i] & 0xF8) == 0xF0)
-		{
-			iter++;
-			count+=4;
-			i+=3;
-		}
-	}
-	s.contents[count] = '\0';
-	s.contents = s.contents + start_byte;
-	return s;
+	int start_byte = bi_of_cpi(s.contents, start);
+	int end_byte = bi_of_cpi(s.contents, end) - start_byte;
+	char *resC = s.contents + start;
+	newStr = new_ustr(resC);
+	newStr.contents[end_byte] = '\0';
+	return newStr;
 	
 }
 
@@ -116,14 +59,14 @@ Given 2 strings s1 and s2, returns a string that is the result of
 concatenating s1 and s2. 
 */
 UStr concat(UStr s1, UStr s2) {
-    	int total_len = s1.length + s2.length;
-       	char* new_contents = malloc(total_len + 1);
-        strcpy(new_contents, str1.contents);
-        strcat(new_contents, str2.contents);
-	free(str1.contents);
-        free(str2.contents);
-	Ustr result = { total_len, new_contents };
-        return result;// TODO: implement this
+//    	int total_len = s1.length + s2.length;
+//     	char* new_contents = malloc(total_len + 1);
+//      strcpy(new_contents, str1.contents);
+//        strcat(new_contents, str2.contents);
+//	free(str1.contents);
+//       free(str2.contents);
+//	Ustr result = { total_len, new_contents };
+//        return result;// TODO: implement this
 
 }
 
